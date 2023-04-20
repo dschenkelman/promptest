@@ -1,0 +1,15 @@
+model_names:
+  - text-davinci-003
+temperature: 0
+max_tokens: 30
+tests:
+  - variables:
+      text: "the longest word in this text is longest"
+    expected_output:
+      type: "string"
+      value: "longest"
+  - variables:
+      text: "the longest word in this text is confusing"
+    expected_output:
+      type: "string"
+      value: "confusing"

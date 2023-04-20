@@ -1,0 +1,8 @@
+template: |
+  Provide the longest word in terms of characters in an input piece of text.
+
+  The text is:
+  {text}
+input_variables:
+  - text
+output_key: longest_word
