@@ -1,0 +1,22 @@
+model_names: ['text-davinci-003']
+temperature: 0.9
+max_tokens: 500
+tests:
+  - variables:
+      genre: "sci-fi"
+    expected_output:
+      type: prompt
+      model: 'text-davinci-003'
+      value:
+        conditions:
+          - "contains at least one futuristic element"
+          - "story has a clear beginning, middle, and end"
+  - variables:
+      genre: "mystery"
+    expected_output:
+      type: prompt
+      model: 'text-davinci-003'
+      value:
+        conditions:
+          - "contains a mystery or puzzle to be solved"
+          - "story has a clear beginning, middle, and end"

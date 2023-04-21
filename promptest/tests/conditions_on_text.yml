@@ -1,0 +1,55 @@
+model_names: [text-davinci-003]
+temperature: 0
+max_tokens: 1000
+tests:
+  - variables:
+      input_text: "The conference will be held on Main Street at 2:30 pm."
+      conditions: contains a street name, contains a time
+    expected_output:
+      type: yaml
+      value: |
+        pass: true
+        conditions:
+          - condition: contains a street name
+            pass: true
+          - condition: contains a time
+            pass: true
+  - variables:
+      input_text: "Don't forget our appointment on Elm Avenue at 11 am."
+      conditions: contains a street name, contains a time
+    expected_output:
+      type: yaml
+      value: |
+        pass: true
+        conditions:
+          - condition: contains a street name
+            pass: true
+          - condition: contains a time
+            pass: true
+  - variables:
+      input_text: "The event is taking place near the park at 6 pm."
+      conditions: contains a street name, contains a time
+    expected_output:
+      type: yaml
+      value: |
+        pass: false
+        conditions:
+          - condition: contains a street name
+            pass: false
+            error_message: No street name provided.
+          - condition: contains a time
+            pass: true
+  - variables:
+      input_text: "The festival will be happening on Oak Lane."
+      conditions: contains a street name, contains a time
+    expected_output:
+      type: yaml
+      value: |
+        pass: false
+        conditions:
+          - condition: contains a street name
+            pass: false
+            error_message: The input text does not contain a street name.
+          - condition: contains a time
+            pass: false
+            error_message: The input text does not contain a time.

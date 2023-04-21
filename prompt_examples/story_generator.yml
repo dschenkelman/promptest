@@ -1,0 +1,5 @@
+template: |
+  Generate a short story in the {genre} genre. It should be at most 150 words long.
+input_variables:
+  - genre
+output_key: story

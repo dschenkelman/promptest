@@ -1,4 +1,5 @@
 import re
+import os
 from langchain.llms import OpenAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
@@ -7,9 +8,39 @@ import yaml
 def _compare_output(output, expected_output):
     if expected_output['type'] == 'regex':
         pattern = re.compile(expected_output['value'])
-        return pattern.match(output) is not None
+        return pattern.match(output) is not None, None
     elif expected_output['type'] == 'string':
-        return output == expected_output['value']
+        return output == expected_output['value'], None
+    elif expected_output['type'] == 'yaml':
+        try:
+            output_yaml = yaml.safe_load(output)
+            expected_yaml = yaml.safe_load(expected_output['value'])
+            return output_yaml == expected_yaml, None
+        except yaml.YAMLError:
+            return False
+    elif expected_output['type'] == 'prompt':
+        model = expected_output['model']
+        llm = OpenAI(model_name=model, temperature=0, max_tokens=1800)
+        out_value = expected_output['value']
+
+        params = { 'input_text': output, 'conditions': out_value['conditions'] }
+        current_file_path = os.path.abspath(__file__)
+        current_dir_path = os.path.dirname(current_file_path)
+
+        with open(os.path.join(current_dir_path, 'templates/conditions_on_text.yml'), 'r') as file:
+            template = file.read()
+
+        prompt_template = PromptTemplate(template=template, input_variables=['input_text', 'conditions'])
+        llm_chain = LLMChain(llm=llm, prompt=prompt_template, output_key='validation_result')
+
+        validation_result = llm_chain.predict(**params).strip()
+
+        try:
+            validation_result_yaml = yaml.safe_load(validation_result)
+            overall_pass = validation_result_yaml.get('pass', False)
+            return overall_pass, validation_result_yaml
+        except yaml.YAMLError:
+            return False
     else:
         return False
 
@@ -41,7 +72,7 @@ def test_models(prompt_data, tests_data):
 
             result = llm_chain.predict(**variables).strip()
 
-            comparison_result = _compare_output(result, expected_output)
+            comparison_result, extra_data = _compare_output(result, expected_output)
 
             if comparison_result:
                 passes += 1
@@ -50,6 +81,7 @@ def test_models(prompt_data, tests_data):
                 'inputs': variables,
                 'output': result,
                 'comparison_result': comparison_result,
+                'extra_data': extra_data
             }
             model_results.append(test_result)
 

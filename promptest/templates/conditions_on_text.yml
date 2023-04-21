@@ -1,0 +1,20 @@
+template: |
+  Validate if the provided input text "{input_text}" meets the following conditions: {conditions}.
+  Provide the pass result for all conditions and for each condition
+  provide a pass value (true/false) in YAML format, along with an error message if the condition is not met.
+  Error messages should be as succint as possible.
+  Ensure that the response is machine-parseable and follows the YAML format.
+  Example YAML formatted output:
+  pass: false
+  conditions:
+    - condition: at least 8 characters
+      pass: false
+      error_message: The input text is less than 8 characters.
+    - condition: contains at least one uppercase letter
+      pass: true
+    - condition: contains at least one lowercase letter
+      pass: true
+    - condition: contains at least one number
+      pass: true
+input_variables: ["input_text", "conditions"]
+output_key: "result"
