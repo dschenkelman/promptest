@@ -1,9 +1,16 @@
 import re
 import os
 from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
+from langchain.prompts.chat import (
+    HumanMessagePromptTemplate,
+    ChatPromptTemplate
+)
 import yaml
+
+CHAT_MODELS=["gpt-4", "gpt-4-0314", "gpt-4-32k", "gpt-4-32k-0314", "gpt-3.5-turbo", "gpt-3.5-turbo-0301"]
 
 def _compare_output(output, expected_output):
     if expected_output['type'] == 'regex':
@@ -30,7 +37,13 @@ def _compare_output(output, expected_output):
         with open(os.path.join(current_dir_path, 'templates/conditions_on_text.yml'), 'r') as file:
             template = file.read()
 
-        prompt_template = PromptTemplate(template=template, input_variables=['input_text', 'conditions'])
+        if model in CHAT_MODELS:
+            llm = ChatOpenAI(model_name=model, temperature=0, max_tokens=1800)
+            prompt_template = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template=template)])
+        else:
+            llm = OpenAI(model_name=model, temperature=0, max_tokens=1800)
+            prompt_template =  PromptTemplate(template=template, input_variables=['input_text', 'conditions'])
+
         llm_chain = LLMChain(llm=llm, prompt=prompt_template, output_key='validation_result')
 
         validation_result = llm_chain.predict(**params).strip()
@@ -61,9 +74,13 @@ def test_models(prompt_data, tests_data):
         passes = 0
         model_results = []
 
-        llm = OpenAI(model_name=model_name, temperature=temperature, max_tokens=max_tokens)
+        if model_name in CHAT_MODELS:
+            llm = ChatOpenAI(model_name=model_name, temperature=temperature, max_tokens=max_tokens)
+            prompt_template = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template=template)])
+        else:
+            llm = OpenAI(model_name=model_name, temperature=temperature, max_tokens=max_tokens)
+            prompt_template = PromptTemplate(template=template, input_variables=input_variables)
 
-        prompt_template = PromptTemplate(template=template, input_variables=input_variables)
         llm_chain = LLMChain(llm=llm, prompt=prompt_template, output_key=output_key)
 
         for item in tests:
