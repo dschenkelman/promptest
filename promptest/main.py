@@ -39,7 +39,9 @@ def save_test_results(model_name, model_results, passes, total, temperature, max
         'prompt_template': template
     }
 
-    filename = f"{model_name}_test_result.yml"
+    model_file_name = os.path.basename(model_name)
+
+    filename = f"{model_file_name}_test_result.yml"
     file_path = os.path.join(output_directory, filename)
 
     with open(file_path, 'w') as outfile:

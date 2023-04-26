@@ -26,7 +26,6 @@ For more information on the command line arguments that `promptest` supports, ru
 promptest --help
 ```
 
-
 ## Example
 Here are a few examples of how to use `promptest` to test LLM prompts.
 
@@ -108,6 +107,11 @@ Run the following command to test the prompt templates:
 ```bash
 promptest --prompt prompt.yaml --tests tests.yaml
 ```
+
+### Supported models
+The following models are supported:
+- [OpenAI](https://platform.openai.com/docs/models): "gpt-4", "gpt-4-0314", "gpt-4-32k", "gpt-4-32k-0314", "gpt-3.5-turbo", "gpt-3.5-turbo-0301", "text-davinci-003", "text-davinci-002", "text-curie-001", "text-babbage-001", "text-ada-001"
+- [gpt4all](https://github.com/nomic-ai/pygpt4all#gpt4all-model): specify the path to the model as a string, e.g. "./model/gpt4all.bin"
 
 ### Output
 The tests output detailed results for each model, including the number of test cases passed and the pass ratio.

@@ -7,4 +7,3 @@ template: |
   {text}
 input_variables:
   - text
-output_key: longest_word
